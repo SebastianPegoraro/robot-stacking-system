@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const GRID_SIZE = 3;
 
@@ -16,31 +18,34 @@ const App = () => {
       const response = await axios.get("http://localhost:5000/state");
       setGrid(response.data.grid);
     } catch (error) {
-      console.error("Error fetching grid:", error);
+      toast.error("Error loading the grid. Please refresh the page.");
     }
   };
 
   const handleSwap = async (toX, toY) => {
     if (!selected) {
-        setSelected({ x: toX, y: toY });
-        return;
+      setSelected({ x: toX, y: toY });
+      return;
     }
     
     const { x: fromX, y: fromY } = selected;
     console.log(`Moving from (${fromX},${fromY}) to (${toX},${toY})`);
     
     try {
-        await axios.post("http://localhost:5000/swap", { 
-            fromX: fromY,  // Swap X and Y for grid coordinates
-            fromY: fromX,
-            toX: toY,     // Swap X and Y for grid coordinates
-            toY: toX
-        });
-        setSelected(null);
-        fetchGrid();
+      await axios.post("http://localhost:5000/swap", { 
+        fromX: fromY,
+        fromY: fromX,
+        toX: toY,
+        toY: toX
+      });
+      setSelected(null);
+      await fetchGrid();
     } catch (error) {
-        console.error("Invalid move:", error);
-        setSelected(null);  // Clear selection on invalid move
+      const message = error.response?.data || "Invalid move";
+      toast.error(message, {
+        autoClose: 3000
+      });
+      setSelected(null);
     }
   };
 
@@ -48,9 +53,9 @@ const App = () => {
     try {
       await axios.post("http://localhost:5000/reset");
       setSelected(null);
-      fetchGrid();
+      await fetchGrid();
     } catch (error) {
-      console.error("Error resetting grid:", error);
+      toast.error("Error resetting the grid");
     }
   };
 
@@ -60,6 +65,17 @@ const App = () => {
 
   return (
     <div style={{ textAlign: "center" }}>
+      <ToastContainer 
+        position="top-center"
+        theme="colored"
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <h1>Robot Stacking Grid</h1>
       <div style={{ display: "grid", gridTemplateColumns: `repeat(${GRID_SIZE}, 50px)`, gap: "5px", justifyContent: "center" }}>
         {grid.map((row, y) =>
@@ -85,6 +101,12 @@ const App = () => {
                   ? "3px solid yellow"
                   : "1px solid black",
                 cursor: "pointer",
+                transition: "all 0.2s ease-in-out", // Smooth hover effect
+                opacity: selected ? 
+                  (selected.x === x && selected.y === y ? 1 : 0.7) : 1,
+                transform: selected && selected.x === x && selected.y === y 
+                  ? "scale(1.1)" 
+                  : "scale(1)",
               }}              
             >
               {cell}
