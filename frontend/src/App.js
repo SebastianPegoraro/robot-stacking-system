@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const GRID_SIZE = 5;
+const GRID_SIZE = 3;
 
 const App = () => {
   const [grid, setGrid] = useState([]);
@@ -20,15 +20,37 @@ const App = () => {
     }
   };
 
-  const handleMove = async (toX, toY) => {
-    if (!selected) return;
-    const { x, y } = selected;
+  const handleSwap = async (toX, toY) => {
+    if (!selected) {
+        setSelected({ x: toX, y: toY });
+        return;
+    }
+    
+    const { x: fromX, y: fromY } = selected;
+    console.log(`Moving from (${fromX},${fromY}) to (${toX},${toY})`);
+    
     try {
-      await axios.post("http://localhost:5000/move", { fromX: x, fromY: y, toX, toY });
+        await axios.post("http://localhost:5000/swap", { 
+            fromX: fromY,  // Swap X and Y for grid coordinates
+            fromY: fromX,
+            toX: toY,     // Swap X and Y for grid coordinates
+            toY: toX
+        });
+        setSelected(null);
+        fetchGrid();
+    } catch (error) {
+        console.error("Invalid move:", error);
+        setSelected(null);  // Clear selection on invalid move
+    }
+  };
+
+  const handleReset = async () => {
+    try {
+      await axios.post("http://localhost:5000/reset");
       setSelected(null);
       fetchGrid();
     } catch (error) {
-      console.error("Invalid move:", error);
+      console.error("Error resetting grid:", error);
     }
   };
 
@@ -40,28 +62,50 @@ const App = () => {
     <div style={{ textAlign: "center" }}>
       <h1>Robot Stacking Grid</h1>
       <div style={{ display: "grid", gridTemplateColumns: `repeat(${GRID_SIZE}, 50px)`, gap: "5px", justifyContent: "center" }}>
-        {grid.map((row, rowIndex) =>
-          row.map((cell, colIndex) => (
+        {grid.map((row, y) =>
+          row.map((cell, x) => (
             <div
-              key={`${rowIndex}-${colIndex}`}
-              onClick={() => (cell ? setSelected({ x: rowIndex, y: colIndex }) : handleMove(rowIndex, colIndex))}
+              key={`${y}-${x}`}
+              onClick={() => handleSwap(x, y)}
               style={{
                 width: "50px",
                 height: "50px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                backgroundColor: cell ? (selected?.x === rowIndex && selected?.y === colIndex ? "yellow" : "lightgray") : "white",
-                border: "1px solid black",
+                backgroundColor: cell
+                  ? cell === "R"
+                    ? "red"
+                    : cell === "G"
+                    ? "green"
+                    : "blue"
+                  : "white",
+                borderRadius: cell ? "50%" : "0%",
+                border: selected && selected.x === x && selected.y === y 
+                  ? "3px solid yellow"
+                  : "1px solid black",
                 cursor: "pointer",
-              }}
+              }}              
             >
               {cell}
             </div>
           ))
         )}
       </div>
-      <button onClick={handleDownloadCSV} style={{ marginTop: "20px", padding: "10px", cursor: "pointer" }}>Download History CSV</button>
+      <div style={{ marginTop: "20px" }}>
+        <button 
+          onClick={handleReset} 
+          style={{ marginRight: "10px", padding: "10px", cursor: "pointer" }}
+        >
+          Reset Grid
+        </button>
+        <button 
+          onClick={handleDownloadCSV} 
+          style={{ padding: "10px", cursor: "pointer" }}
+        >
+          Download History CSV
+        </button>
+      </div>
     </div>
   );
 };
