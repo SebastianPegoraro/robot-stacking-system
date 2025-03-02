@@ -125,7 +125,7 @@ const App = () => {
 
       {/* Flex container for rules and grid */}
       <div className="main-container">
-        {/* Rules Section */}
+        {/* Rules Section 
         <div className="rules-container">
           <h2>Game Rules</h2>
           <ul>
@@ -138,7 +138,7 @@ const App = () => {
             <li>Green circles can have any color stacked on top.</li>
             <li>Blue circles can only have red circles placed above them.</li>
           </ul>
-        </div>
+        </div>*/}
 
         <div className="grid-container">
           {grid.map((row, y) =>
