@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "./App.css";
 
 const GRID_SIZE = 3;
 
@@ -108,7 +109,7 @@ const App = () => {
   };
 
   return (
-    <div style={{ textAlign: "center" }}>
+    <div className="app-container">
       <ToastContainer
         position="top-center"
         theme="colored"
@@ -170,17 +171,11 @@ const App = () => {
           ))
         )}
       </div>
-      <div style={{ marginTop: "20px" }}>
-        <button
-          onClick={handleReset}
-          style={{ marginRight: "10px", padding: "10px", cursor: "pointer" }}
-        >
+      <div className="button-container">
+        <button className="action-button" onClick={handleReset}>
           Reset Grid
         </button>
-        <button
-          onClick={handleDownloadCSV}
-          style={{ padding: "10px", cursor: "pointer" }}
-        >
+        <button className="action-button" onClick={handleDownloadCSV}>
           Download History CSV
         </button>
       </div>
