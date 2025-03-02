@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const GRID_SIZE = 3;
 
@@ -14,11 +14,20 @@ const App = () => {
     fetchGrid();
   }, []);
 
+  // Check the win condition whenever the grid changes
+  useEffect(() => {
+    if (grid.length > 0) {
+      checkWinCondition();
+    }
+  }, [grid]); // Run when the grid state changes
+
   const fetchGrid = async () => {
     try {
       const response = await axios.get("http://localhost:5000/state");
       setGrid(response.data.grid);
-      setInitialRightColumn(response.data.grid.map(row => row[GRID_SIZE - 1])); // Store initial state
+      setInitialRightColumn(
+        response.data.grid.map((row) => row[GRID_SIZE - 1])
+      ); // Store initial state
     } catch (error) {
       toast.error("Error loading the grid. Please refresh the page.");
     }
@@ -29,33 +38,40 @@ const App = () => {
       setSelected({ x: toX, y: toY });
       return;
     }
-    
+
     const { x: fromX, y: fromY } = selected;
     console.log(`Moving from (${fromX},${fromY}) to (${toX},${toY})`);
 
     // Check if the move is valid (only horizontal or vertical)
-    const isValidMove = (fromX === toX || fromY === toY);
+    const isValidMove = fromX === toX || fromY === toY;
     if (!isValidMove) {
-        toast.error("Invalid move: You can only move horizontally or vertically.");
-        return;
+      toast.error(
+        "Invalid move: You can only move horizontally or vertically."
+      );
+      return;
     }
 
     try {
-      await axios.post("http://localhost:5000/swap", { 
+      // Perform the swap
+      await axios.post("http://localhost:5000/swap", {
         fromX: fromY,
         fromY: fromX,
         toX: toY,
-        toY: toX
+        toY: toX,
       });
+
+      // Reset selected after the swap
       setSelected(null);
+
+      // Fetch the updated grid after the swap
       await fetchGrid();
-      
+
       // Check if the game is won after the grid has been updated
       checkWinCondition();
     } catch (error) {
       const message = error.response?.data || "Invalid move";
       toast.error(message, {
-        autoClose: 3000
+        autoClose: 3000,
       });
       setSelected(null);
     }
@@ -76,8 +92,8 @@ const App = () => {
   };
 
   const checkWinCondition = () => {
-    const rightColumn = grid.map(row => row[GRID_SIZE - 1]); // Get the right column
-    const winningOrder = ['R', 'B', 'G']; // Define the winning order
+    const rightColumn = grid.map((row) => row[GRID_SIZE - 1]); // Get the right column
+    const winningOrder = ["R", "B", "G"]; // Define the winning order
 
     console.log("Current right column:", rightColumn);
     console.log("Initial right column:", initialRightColumn);
@@ -85,15 +101,15 @@ const App = () => {
 
     // Check if the right column matches the winning order
     if (JSON.stringify(rightColumn) === JSON.stringify(winningOrder)) {
-        toast.success("Congratulations! You've completed the game!", {
-            autoClose: 5000
-        });
+      toast.success("Congratulations! You've completed the game!", {
+        autoClose: 5000,
+      });
     }
   };
 
   return (
     <div style={{ textAlign: "center" }}>
-      <ToastContainer 
+      <ToastContainer
         position="top-center"
         theme="colored"
         hideProgressBar={false}
@@ -105,7 +121,14 @@ const App = () => {
         pauseOnHover
       />
       <h1>Robot Stacking Grid</h1>
-      <div style={{ display: "grid", gridTemplateColumns: `repeat(${GRID_SIZE}, 50px)`, gap: "5px", justifyContent: "center" }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: `repeat(${GRID_SIZE}, 50px)`,
+          gap: "5px",
+          justifyContent: "center",
+        }}
+      >
         {grid.map((row, y) =>
           row.map((cell, x) => (
             <div
@@ -125,17 +148,22 @@ const App = () => {
                     : "blue"
                   : "white",
                 borderRadius: cell ? "50%" : "0%",
-                border: selected && selected.x === x && selected.y === y 
-                  ? "3px solid yellow"
-                  : "1px solid black",
+                border:
+                  selected && selected.x === x && selected.y === y
+                    ? "3px solid yellow"
+                    : "1px solid black",
                 cursor: "pointer",
                 transition: "all 0.2s ease-in-out", // Smooth hover effect
-                opacity: selected ? 
-                  (selected.x === x && selected.y === y ? 1 : 0.7) : 1,
-                transform: selected && selected.x === x && selected.y === y 
-                  ? "scale(1.1)" 
-                  : "scale(1)",
-              }}              
+                opacity: selected
+                  ? selected.x === x && selected.y === y
+                    ? 1
+                    : 0.7
+                  : 1,
+                transform:
+                  selected && selected.x === x && selected.y === y
+                    ? "scale(1.1)"
+                    : "scale(1)",
+              }}
             >
               {cell}
             </div>
@@ -143,14 +171,14 @@ const App = () => {
         )}
       </div>
       <div style={{ marginTop: "20px" }}>
-        <button 
-          onClick={handleReset} 
+        <button
+          onClick={handleReset}
           style={{ marginRight: "10px", padding: "10px", cursor: "pointer" }}
         >
           Reset Grid
         </button>
-        <button 
-          onClick={handleDownloadCSV} 
+        <button
+          onClick={handleDownloadCSV}
           style={{ padding: "10px", cursor: "pointer" }}
         >
           Download History CSV
