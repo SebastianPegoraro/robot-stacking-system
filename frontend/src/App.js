@@ -122,55 +122,68 @@ const App = () => {
         pauseOnHover
       />
       <h1>Robot Stacking Grid</h1>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: `repeat(${GRID_SIZE}, 50px)`,
-          gap: "5px",
-          justifyContent: "center",
-        }}
-      >
-        {grid.map((row, y) =>
-          row.map((cell, x) => (
-            <div
-              key={`${y}-${x}`}
-              onClick={() => handleSwap(x, y)}
-              style={{
-                width: "50px",
-                height: "50px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: cell
-                  ? cell === "R"
-                    ? "red"
-                    : cell === "G"
-                    ? "green"
-                    : "blue"
-                  : "white",
-                borderRadius: cell ? "50%" : "0%",
-                border:
-                  selected && selected.x === x && selected.y === y
-                    ? "3px solid yellow"
-                    : "1px solid black",
-                cursor: "pointer",
-                transition: "all 0.2s ease-in-out", // Smooth hover effect
-                opacity: selected
-                  ? selected.x === x && selected.y === y
-                    ? 1
-                    : 0.7
-                  : 1,
-                transform:
-                  selected && selected.x === x && selected.y === y
-                    ? "scale(1.1)"
-                    : "scale(1)",
-              }}
-            >
-              {cell}
-            </div>
-          ))
-        )}
+
+      {/* Flex container for rules and grid */}
+      <div className="main-container">
+        {/* Rules Section */}
+        <div className="rules-container">
+          <h2>Game Rules</h2>
+          <ul>
+            <li>Stacking must follow these rules:</li>
+            <li>
+              You can only move horizontally or vertically, with no diagonal
+              movement allowed.
+            </li>
+            <li>Red circles cannot have any circles above them.</li>
+            <li>Green circles can have any color stacked on top.</li>
+            <li>Blue circles can only have red circles placed above them.</li>
+          </ul>
+        </div>
+
+        <div className="grid-container">
+          {grid.map((row, y) =>
+            row.map((cell, x) => (
+              <div
+                key={`${y}-${x}`}
+                onClick={() => handleSwap(x, y)}
+                style={{
+                  width: "50px",
+                  height: "50px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: cell
+                    ? cell === "R"
+                      ? "red"
+                      : cell === "G"
+                      ? "green"
+                      : "blue"
+                    : "white",
+                  borderRadius: cell ? "50%" : "0%",
+                  border:
+                    selected && selected.x === x && selected.y === y
+                      ? "3px solid yellow"
+                      : "1px solid black",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease-in-out", // Smooth hover effect
+                  opacity: selected
+                    ? selected.x === x && selected.y === y
+                      ? 1
+                      : 0.7
+                    : 1,
+                  transform:
+                    selected && selected.x === x && selected.y === y
+                      ? "scale(1.1)"
+                      : "scale(1)",
+                }}
+              >
+                {cell}
+              </div>
+            ))
+          )}
+        </div>
       </div>
+
       <div className="button-container">
         <button className="action-button" onClick={handleReset}>
           Reset Grid
