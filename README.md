@@ -9,6 +9,7 @@ This project is a full-stack application where a robot moves and stacks colored 
 ---
 
 ## 📁 Project Structure
+
 ```
 robot-circle-stacking-system/
 ├── backend/   # Node.js + Express backend
@@ -21,17 +22,20 @@ robot-circle-stacking-system/
 ## 🛠️ Installation & Run
 
 ### 1. Clone the repository:
+
 ```bash
 git clone https://github.com/SebastianPegoraro/robot-stacking-system.git
 cd robot-circle-stacking-system
 ```
 
 ### 2. Install dependencies (root + frontend + backend):
+
 ```bash
 npm install
 ```
 
 ### 3. Start the full application:
+
 ```bash
 npm start
 ```
@@ -39,6 +43,7 @@ npm start
 ---
 
 ## 🌐 Usage
+
 - Open your browser and navigate to:  
   [http://localhost:3000](http://localhost:3000)
 
@@ -48,8 +53,8 @@ npm start
 ---
 
 ## 🎮 How to Play
+
 - Select a circle on the grid by clicking on it.
-- Click an empty cell to move the selected circle.
 - Moves are validated by the backend based on these rules:
   - **Red (R):** Nothing can stack on top.
   - **Green (G):** Any color can stack above.
@@ -59,19 +64,23 @@ npm start
 ---
 
 ## 📄 CSV History
+
 - The backend records every move.
 - Download the CSV to review all moves with positions and colors.
 
 ---
 
 ## 🚀 Technologies
+
 - Frontend: **React**
 - Backend: **Node.js + Express**
 - Package Runner: **Concurrently**
+- Toast: **Toastify**
 
 ---
 
 ## 💡 Notes
+
 - The root `package.json` handles everything:
   - `postinstall` installs dependencies in both frontend and backend.
   - `start` runs both servers at once.
@@ -79,5 +88,5 @@ npm start
 ---
 
 ## 🧑‍💻 Author
-Sebastian Pegoraro
 
+Sebastian Pegoraro
